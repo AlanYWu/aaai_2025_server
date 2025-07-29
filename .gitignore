@@ -1,6 +1,7 @@
 models/Qwen2.5-7B-Instruct/
 models/Qwen2.5-7B-Instruct-Braille/
 saves/
+.DS_Store
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
