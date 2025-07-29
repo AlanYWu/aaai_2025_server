@@ -1,3 +1,6 @@
 data/Passage_dataset/passage_100pc_test_0727_v2.json filter=lfs diff=lfs merge=lfs -text
 data/Passage_dataset/passage_100pc_train_0727_v2.json filter=lfs diff=lfs merge=lfs -text
 data/Passage_dataset/passage_100pc_val_0727_v2.json filter=lfs diff=lfs merge=lfs -text
+data/Sentence_dataset/sentence_100pc_test_0727_v2[[:space:]]copy.json filter=lfs diff=lfs merge=lfs -text
+data/Sentence_dataset/sentence_100pc_test_0727_v2.json filter=lfs diff=lfs merge=lfs -text
+data/Sentence_dataset/sentence_100pc_train_0727_v2[[:space:]]copy.json filter=lfs diff=lfs merge=lfs -text
