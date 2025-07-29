@@ -14,18 +14,18 @@ finetuning_type: full
 # pure_bf16: true
 "bf16": true
 # choices: [ds_z0_config.json, ds_z2_config.json, ds_z3_config.json]
-deepspeed: train_config/deepspeed/ds_z3_offload_config.json  
-enable_liger_kernel: true
-use_unsloth_gc: true
+deepspeed: train_config/deepspeed/ds_z3_config.json  
+# enable_liger_kernel: true
+# use_unsloth_gc: true
 
 
 ### dataset
-dataset: sentence_100pc_train_0727_v2
+dataset: passage_100pc_train_0727_v2
 template: qwen # sharegpt
-cutoff_len: 512 
+cutoff_len: 2048 
 # max_samples: 500
 overwrite_cache: true
-preprocessing_num_workers: 16
+preprocessing_num_workers: 4
 
 ### output
 output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_100pc_qwen2.5i_train_fullsft_0727_v2/
@@ -45,13 +45,13 @@ warmup_ratio: 0.05
 ddp_timeout: 180000000
 save_only_model: true
 train_on_prompt: false
-report_to: tensorboard  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 flash_attn: auto
 disable_shuffling: true
 
 ### eval
-eval_dataset: sentence_100pc_val_0727_v2
-per_device_eval_batch_size: 3
+eval_dataset: passage_100pc_val_0727_v2
+per_device_eval_batch_size: 50
 eval_strategy: steps
 eval_steps: 500
 # predict_with_generate: true
