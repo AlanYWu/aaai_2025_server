@@ -132,7 +132,7 @@ def process_file(
     print(f"Number of ratios: {len(ratios)}")
 
     # Create mixed dataset
-    mixed_messages = []
+    processed_messages = []
     kept_tones_total = 0
     
     print("Creating mixed dataset with different tone ratios...")
@@ -150,7 +150,7 @@ def process_file(
             content = msg['content']
             new_content = remove_tones_chunk(content, ratio)
             kept_tones_chunk += sum(ch in TONE_CHARS for ch in new_content)
-            mixed_messages.append({
+            processed_messages.append({
                 'role': msg['role'],
                 'content': new_content
             })
@@ -167,20 +167,20 @@ def process_file(
         }
 
     # Save the mixed dataset
-    mixed_data = {'messages': mixed_messages}
-    mixed_file = output_dir / 'sentence_train_100pc_20pc_0730_v1.json'
-    save_json(mixed_data, mixed_file)
+    output_file = output_dir / 'sentence_train_100pc_20pc_0730_v1.json'
+    output_data = [{'messages': conv} for conv in processed_messages]
+    save_json(output_data, output_file)
     
     # Update metadata
     metadata['total_kept_tones'] = kept_tones_total
-    metadata['total_messages'] = len(mixed_messages)
+    metadata['total_messages'] = len(processed_messages)
     
     # Save metadata
     meta_file = output_dir / 'sentence_train_100pc_20pc_0730_v1_metadata.json'
     save_json(metadata, meta_file)
     
-    print(f"Mixed dataset saved to: {mixed_file}")
-    print(f"Total messages in mixed dataset: {len(mixed_messages)}")
+    print(f"Mixed dataset saved to: {output_file}")
+    print(f"Total messages in mixed dataset: {len(processed_messages)}")
     print(f"Total tones kept: {kept_tones_total}")
     print(f"Number sequences found: {metadata['total_numbers_found']}")
 

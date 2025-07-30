@@ -138,11 +138,12 @@ def process_file_10pc(
         })
 
     # Save the processed dataset
-    output_data = {'messages': processed_messages}
     
     # Generate output filename based on input filename
     input_stem = input_path.stem
     output_file = output_dir / 'sentence_train_10pc_0730_v1.json'
+
+    output_data = [{'messages': conv} for conv in processed_messages]
     save_json(output_data, output_file)
     
     # Update metadata

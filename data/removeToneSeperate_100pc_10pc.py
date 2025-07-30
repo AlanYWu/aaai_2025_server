@@ -84,8 +84,8 @@ def process_file_separate(
                 'role': msg['role'],
                 'content': new_content
             })
-        output_data = {'messages': processed_messages}
         output_file = output_dir / f'validation_{int(ratio*100)}pc.json'
+        output_data = [{'messages': conv} for conv in processed_messages]
         save_json(output_data, output_file)
         print(f"Saved {output_file}, kept tones: {kept_tones}, messages: {len(processed_messages)}")
 
