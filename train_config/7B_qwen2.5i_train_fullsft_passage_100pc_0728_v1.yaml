@@ -28,7 +28,7 @@ overwrite_cache: true
 preprocessing_num_workers: 4
 
 ### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_100pc_qwen2.5i_train_fullsft_0727_v2/
+output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_passage_100pc_qwen2.5i_train_fullsft_0727_v2/
 logging_steps: 10
 save_steps: 500
 plot_loss: true
