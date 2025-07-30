@@ -358,5 +358,41 @@
       "assistant_tag": "assistant",
       "system_tag": "system"
     }
+  },
+  "sentence_10pc_train_0730_v2": {
+    "file_name": "Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_train_0730_v2.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "sentence_10pc_val_0730_v2": {
+    "file_name": "Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_val_0730_v2.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+    "sentence_10pc_test_0730_v2": {
+      "file_name": "Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_test_0730_v2.json",
+      "formatting": "sharegpt",
+      "columns": {"messages": "messages"},
+      "tags": {
+        "role_tag": "role",
+        "content_tag": "content",
+        "user_tag": "user",
+        "assistant_tag": "assistant",
+        "system_tag": "system"
+    }
   }
 }
