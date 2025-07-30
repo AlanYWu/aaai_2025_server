@@ -233,3 +233,6 @@ data/Sentence_dataset/sentence_100pc_val_0727_v2.json
 data/Sentence_dataset/sentence_100pc_train_0727_v2.json
 data/Sentence_dataset/sentence_100pc_test_0727_v2.json
 data/Sentence_dataset/sentence_100pc_val_0727_v2.json
+data/Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_test_0730_v2.json
+data/Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_train_0730_v2.json
+data/Sentence_dataset/Chinese-Braille-Dataset-10per-Tone/sentence_10pc_val_0730_v2.json
