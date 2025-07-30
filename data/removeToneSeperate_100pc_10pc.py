@@ -56,38 +56,46 @@ def process_file_separate(
     output_dir: Path
 ) -> None:
     data = load_json(input_path)
+    
+    # Handle both list format (new) and dict format (old)
     if isinstance(data, list):
-        all_messages = []
-        for item in data:
-            if 'messages' in item:
-                all_messages.extend(item['messages'])
+        # New format: list of conversation objects with 'messages' key
+        conversations = data
     else:
-        all_messages = data.get('messages', [])
+        # Old format: single object with 'messages' key
+        conversations = [data]
 
-    total_messages = len(all_messages)
-    chunk_size = total_messages // 10
-    print(f"Total messages: {total_messages}, chunk size: {chunk_size}")
+    total_conversations = len(conversations)
+    chunk_size = total_conversations // 10
+    print(f"Total conversations: {total_conversations}, chunk size: {chunk_size}")
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
     for i, ratio in enumerate([x / 10 for x in range(10, 0, -1)]):
         start_idx = i * chunk_size
-        end_idx = start_idx + chunk_size if i < 9 else total_messages
-        chunk_messages = all_messages[start_idx:end_idx]
-        processed_messages = []
+        end_idx = start_idx + chunk_size if i < 9 else total_conversations
+        chunk_conversations = conversations[start_idx:end_idx]
+        processed_conversations = []
         kept_tones = 0
-        for msg in tqdm(chunk_messages, desc=f"Processing {int(ratio*100)}% chunk"):
-            content = msg['content']
-            new_content = remove_tones_chunk(content, ratio)
-            kept_tones += sum(ch in TONE_CHARS for ch in new_content)
-            processed_messages.append({
-                'role': msg['role'],
-                'content': new_content
-            })
+        
+        for conv in tqdm(chunk_conversations, desc=f"Processing {int(ratio*100)}% chunk"):
+            if 'messages' in conv:
+                processed_messages = []
+                for msg in conv['messages']:
+                    content = msg['content']
+                    new_content = remove_tones_chunk(content, ratio)
+                    kept_tones += sum(ch in TONE_CHARS for ch in new_content)
+                    processed_messages.append({
+                        'role': msg['role'],
+                        'content': new_content
+                    })
+                processed_conversations.append({
+                    'messages': processed_messages
+                })
+        
         output_file = output_dir / f'validation_{int(ratio*100)}pc.json'
-        output_data = [{'messages': conv} for conv in processed_messages]
-        save_json(output_data, output_file)
-        print(f"Saved {output_file}, kept tones: {kept_tones}, messages: {len(processed_messages)}")
+        save_json(processed_conversations, output_file)
+        print(f"Saved {output_file}, kept tones: {kept_tones}, conversations: {len(processed_conversations)}")
 
 if __name__ == '__main__':
     import argparse

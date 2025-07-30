@@ -85,14 +85,11 @@ def process_file_10pc(
     
     # Handle both list format (new) and dict format (old)
     if isinstance(data, list):
-        # New format: list of objects with 'messages' key
-        all_messages = []
-        for item in data:
-            if 'messages' in item:
-                all_messages.extend(item['messages'])
+        # New format: list of conversation objects with 'messages' key
+        conversations = data
     else:
         # Old format: single object with 'messages' key
-        all_messages = data.get('messages', [])
+        conversations = [data]
 
     # Prepare metadata container
     metadata = {
@@ -105,37 +102,45 @@ def process_file_10pc(
 
     # Count total tones and numbers in the original dataset
     print("Counting original tones and numbers...")
-    for msg in tqdm(all_messages, desc="Counting original tones"):
-        text = msg.get('content', '')
-        metadata['total_tones_original'] += sum(ch in TONE_CHARS for ch in text)
-        # Count number sequences (⠼ followed by digits)
-        i = 0
-        while i < len(text):
-            if text[i] == NUMBER_PREFIX:
-                metadata['total_numbers_found'] += 1
-                # Skip to end of number sequence
-                i += 1
-                while i < len(text) and text[i] in DIGIT_CHARS:
-                    i += 1
-            else:
-                i += 1
+    for conv in tqdm(conversations, desc="Counting original tones"):
+        if 'messages' in conv:
+            for msg in conv['messages']:
+                text = msg.get('content', '')
+                metadata['total_tones_original'] += sum(ch in TONE_CHARS for ch in text)
+                # Count number sequences (⠼ followed by digits)
+                i = 0
+                while i < len(text):
+                    if text[i] == NUMBER_PREFIX:
+                        metadata['total_numbers_found'] += 1
+                        # Skip to end of number sequence
+                        i += 1
+                        while i < len(text) and text[i] in DIGIT_CHARS:
+                            i += 1
+                    else:
+                        i += 1
 
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Process all messages to keep only 10% of tones
-    print("Processing messages to keep 10% of tones...")
-    processed_messages = []
+    # Process all conversations to keep only 10% of tones
+    print("Processing conversations to keep 10% of tones...")
+    processed_conversations = []
     kept_tones = 0
     
-    for msg in tqdm(all_messages, desc="Processing messages"):
-        content = msg['content']
-        new_content = remove_tones_chunk(content, 0.10)
-        kept_tones += sum(ch in TONE_CHARS for ch in new_content)
-        processed_messages.append({
-            'role': msg['role'],
-            'content': new_content
-        })
+    for conv in tqdm(conversations, desc="Processing conversations"):
+        if 'messages' in conv:
+            processed_messages = []
+            for msg in conv['messages']:
+                content = msg['content']
+                new_content = remove_tones_chunk(content, 0.10)
+                kept_tones += sum(ch in TONE_CHARS for ch in new_content)
+                processed_messages.append({
+                    'role': msg['role'],
+                    'content': new_content
+                })
+            processed_conversations.append({
+                'messages': processed_messages
+            })
 
     # Save the processed dataset
     
@@ -143,12 +148,11 @@ def process_file_10pc(
     input_stem = input_path.stem
     output_file = output_dir / 'sentence_train_10pc_0730_v1.json'
 
-    output_data = [{'messages': conv} for conv in processed_messages]
-    save_json(output_data, output_file)
+    save_json(processed_conversations, output_file)
     
     # Update metadata
     metadata['total_tones_kept'] = kept_tones
-    metadata['total_messages'] = len(processed_messages)
+    metadata['total_conversations'] = len(processed_conversations)
     metadata['actual_ratio'] = kept_tones / metadata['total_tones_original'] if metadata['total_tones_original'] > 0 else 0
     
     # Save metadata
@@ -156,7 +160,7 @@ def process_file_10pc(
     save_json(metadata, meta_file)
     
     print(f"Processed dataset saved to: {output_file}")
-    print(f"Total messages: {len(processed_messages)}")
+    print(f"Total conversations: {len(processed_conversations)}")
     print(f"Original tones: {metadata['total_tones_original']}")
     print(f"Kept tones: {kept_tones}")
     print(f"Number sequences found: {metadata['total_numbers_found']}")

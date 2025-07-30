@@ -87,14 +87,11 @@ def process_file(
     
     # Handle both list format (new) and dict format (old)
     if isinstance(data, list):
-        # New format: list of objects with 'messages' key
-        all_messages = []
-        for item in data:
-            if 'messages' in item:
-                all_messages.extend(item['messages'])
+        # New format: list of conversation objects with 'messages' key
+        conversations = data
     else:
         # Old format: single object with 'messages' key
-        all_messages = data.get('messages', [])
+        conversations = [data]
 
     # Prepare metadata container
     metadata = {
@@ -106,54 +103,62 @@ def process_file(
 
     # Count total tones and numbers in the dataset
     print("Counting total tones and numbers...")
-    for msg in tqdm(all_messages, desc="Counting tones"):
-        text = msg.get('content', '')
-        metadata['total_tones'] += sum(ch in TONE_CHARS for ch in text)
-        # Count number sequences (⠼ followed by digits)
-        i = 0
-        while i < len(text):
-            if text[i] == NUMBER_PREFIX:
-                metadata['total_numbers_found'] += 1
-                # Skip to end of number sequence
-                i += 1
-                while i < len(text) and text[i] in DIGIT_CHARS:
-                    i += 1
-            else:
-                i += 1
+    for conv in tqdm(conversations, desc="Counting tones"):
+        if 'messages' in conv:
+            for msg in conv['messages']:
+                text = msg.get('content', '')
+                metadata['total_tones'] += sum(ch in TONE_CHARS for ch in text)
+                # Count number sequences (⠼ followed by digits)
+                i = 0
+                while i < len(text):
+                    if text[i] == NUMBER_PREFIX:
+                        metadata['total_numbers_found'] += 1
+                        # Skip to end of number sequence
+                        i += 1
+                        while i < len(text) and text[i] in DIGIT_CHARS:
+                            i += 1
+                    else:
+                        i += 1
 
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Calculate chunk size for each ratio
-    total_messages = len(all_messages)
-    chunk_size = total_messages // len(ratios)
-    print(f"Total messages: {total_messages}")
+    total_conversations = len(conversations)
+    chunk_size = total_conversations // len(ratios)
+    print(f"Total conversations: {total_conversations}")
     print(f"Chunk size per ratio: {chunk_size}")
     print(f"Number of ratios: {len(ratios)}")
 
     # Create mixed dataset
-    processed_messages = []
+    processed_conversations = []
     kept_tones_total = 0
     
     print("Creating mixed dataset with different tone ratios...")
     for i, ratio in enumerate(tqdm(ratios, desc="Processing ratios")):
         start_idx = i * chunk_size
-        end_idx = start_idx + chunk_size if i < len(ratios) - 1 else total_messages
+        end_idx = start_idx + chunk_size if i < len(ratios) - 1 else total_conversations
         
-        chunk_messages = all_messages[start_idx:end_idx]
+        chunk_conversations = conversations[start_idx:end_idx]
         ratio_pct = int(ratio * 100)
         
-        print(f"Processing {ratio_pct}% ratio: messages {start_idx}-{end_idx-1}")
+        print(f"Processing {ratio_pct}% ratio: conversations {start_idx}-{end_idx-1}")
         
         kept_tones_chunk = 0
-        for msg in tqdm(chunk_messages, desc=f"Processing {ratio_pct}% chunk", leave=False):
-            content = msg['content']
-            new_content = remove_tones_chunk(content, ratio)
-            kept_tones_chunk += sum(ch in TONE_CHARS for ch in new_content)
-            processed_messages.append({
-                'role': msg['role'],
-                'content': new_content
-            })
+        for conv in tqdm(chunk_conversations, desc=f"Processing {ratio_pct}% chunk", leave=False):
+            if 'messages' in conv:
+                processed_messages = []
+                for msg in conv['messages']:
+                    content = msg['content']
+                    new_content = remove_tones_chunk(content, ratio)
+                    kept_tones_chunk += sum(ch in TONE_CHARS for ch in new_content)
+                    processed_messages.append({
+                        'role': msg['role'],
+                        'content': new_content
+                    })
+                processed_conversations.append({
+                    'messages': processed_messages
+                })
         
         kept_tones_total += kept_tones_chunk
         
@@ -163,24 +168,23 @@ def process_file(
             'ratio': ratio,
             'start_idx': start_idx,
             'end_idx': end_idx,
-            'message_count': len(chunk_messages)
+            'conversation_count': len(chunk_conversations)
         }
 
     # Save the mixed dataset
     output_file = output_dir / 'sentence_train_100pc_20pc_0730_v1.json'
-    output_data = [{'messages': conv} for conv in processed_messages]
-    save_json(output_data, output_file)
+    save_json(processed_conversations, output_file)
     
     # Update metadata
     metadata['total_kept_tones'] = kept_tones_total
-    metadata['total_messages'] = len(processed_messages)
+    metadata['total_conversations'] = len(processed_conversations)
     
     # Save metadata
     meta_file = output_dir / 'sentence_train_100pc_20pc_0730_v1_metadata.json'
     save_json(metadata, meta_file)
     
     print(f"Mixed dataset saved to: {output_file}")
-    print(f"Total messages in mixed dataset: {len(processed_messages)}")
+    print(f"Total conversations in mixed dataset: {len(processed_conversations)}")
     print(f"Total tones kept: {kept_tones_total}")
     print(f"Number sequences found: {metadata['total_numbers_found']}")
 
