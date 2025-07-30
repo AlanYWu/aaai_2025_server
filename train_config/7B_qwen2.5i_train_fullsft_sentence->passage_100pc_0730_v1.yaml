@@ -1,9 +1,9 @@
 ### goal
-# Train sentence with omitted tones.
-# {100pc~20pc tone} 100% of dataset, {10pc tone} 100% of dataset
+# Train sentence Qwen2.5 7B Instruct on 2 H800 80GB
+# 同样的设置，增加了batch size
 
 ### model
-model_name_or_path: models/Qwen2.5-7B-Instruct-Braille
+model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_0730_v1/checkpoint-10000
 trust_remote_code: true
 
 ### method
@@ -19,7 +19,7 @@ deepspeed: train_config/deepspeed/ds_z3_config.json
 
 
 ### dataset
-dataset: sentence_train_100pc_20pc_0730_v1, sentence_train_10pc_0730_v1
+dataset: passage_100pc_train_0727_v2
 template: qwen # sharegpt
 cutoff_len: 512 
 # max_samples: 500
@@ -27,11 +27,11 @@ overwrite_cache: true
 preprocessing_num_workers: 4
 
 ### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v1/
+output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence->passage_100pc_qwen2.5i_train_fullsft_0727_v2/
 logging_steps: 10
-save_steps: 1000
+save_steps: 500
 plot_loss: true
-# overwrite_output_dir: true
+overwrite_output_dir: true
 
 ### train
 per_device_train_batch_size: 10
@@ -48,11 +48,10 @@ flash_attn: auto
 disable_shuffling: true
 
 ### eval
-eval_dataset: sentence_validation_100pc_json, sentence_validation_90pc_json, sentence_validation_80pc_json, sentence_validation_70pc_json, sentence_validation_60pc_json, sentence_validation_50pc_json, sentence_validation_40pc_json, sentence_validation_30pc_json, sentence_validation_20pc_json, sentence_validation_10pc_json
-eval_on_each_dataset: true  
+eval_dataset: passage_100pc_val_0727_v2
 per_device_eval_batch_size: 10
 eval_strategy: steps
-eval_steps: 1000
+eval_steps: 500
 # predict_with_generate: true
 do_eval: true
 # do_predict: true
