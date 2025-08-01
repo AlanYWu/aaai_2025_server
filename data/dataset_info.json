@@ -394,5 +394,41 @@
         "assistant_tag": "assistant",
         "system_tag": "system"
     }
+  },
+    "passage_train_10pc_0801_v1": {
+    "file_name": "Passage_dataset/passage_10pc/passage_train_10pc_0801_v1.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+    "passage_val_10pc_0801_v1": {
+    "file_name": "Passage_dataset/passage_10pc/passage_val_10pc_0801_v1.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+    "passage_test_10pc_0801_v1": {
+    "file_name": "Passage_dataset/passage_10pc/passage_test_10pc_0801_v1.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
   }
 }
