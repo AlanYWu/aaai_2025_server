@@ -1,11 +1,11 @@
 # ### goal
-# # Train sentence Qwen2.5 7B Instruct on 2 H800 80GB
-# # 同样的设置，增加了batch size
+# # Train sentence with omitted tones.
+# # {100pc~20pc tone} 100% of dataset, {10pc tone} 100% of dataset
 
 # ### model
 # model_name_or_path: models/Qwen2.5-7B-Instruct-Braille
 # trust_remote_code: true
-# # resume_from_checkpoint: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_10pc_qwen2.5i_train_fullsft_0731_v1/checkpoint-500
+# resume_from_checkpoint: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v1/checkpoint-7000
 
 # ### method
 # stage: sft
@@ -20,7 +20,7 @@
 
 
 # ### dataset
-# dataset: sentence_10pc_train_0730_v2
+# dataset: sentence_train_100pc_20pc_0730_v1, sentence_train_10pc_0730_v1
 # template: qwen # sharegpt
 # cutoff_len: 512 
 # # max_samples: 500
@@ -28,9 +28,9 @@
 # preprocessing_num_workers: 4
 
 # ### output
-# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_10pc_qwen2.5i_train_fullsft_0731_v2/
+# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_resume_from_v1_v3/
 # logging_steps: 10
-# save_steps: 500
+# save_steps: 1000
 # plot_loss: true
 # # overwrite_output_dir: true
 
@@ -49,19 +49,20 @@
 # disable_shuffling: true
 
 # ### eval
-# eval_dataset: sentence_10pc_val_0730_v2
+# eval_dataset: sentence_validation_100pc_json, sentence_validation_90pc_json, sentence_validation_80pc_json, sentence_validation_70pc_json, sentence_validation_60pc_json, sentence_validation_50pc_json, sentence_validation_40pc_json, sentence_validation_30pc_json, sentence_validation_20pc_json, sentence_validation_10pc_json
+# eval_on_each_dataset: true  
 # per_device_eval_batch_size: 10
 # eval_strategy: steps
-# eval_steps: 500
+# eval_steps: 1000
 # # predict_with_generate: true
 # do_eval: true
 # # do_predict: true
 
 
-######
+########
 # Test1 Sentence_100pc_90pc_..._10pc
 ### model
-model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_10pc_qwen2.5i_train_fullsft_0731_v1/checkpoint-26023
+model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_resume_from_v1_v3/checkpoint-50839
 trust_remote_code: true
 
 ### method
@@ -77,7 +78,7 @@ preprocessing_num_workers: 16
 dataloader_num_workers: 4
 
 ### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_10pc_qwen2.5i_train_fullsft_0731_v1/test
+output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_resume_from_v1_v3/test
 overwrite_output_dir: true
 report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 
