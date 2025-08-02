@@ -158,10 +158,13 @@ def create_comparison_plots(model_results, anova_results, output_dir="."):
     sns.set_palette("husl")
     
     for metric in metrics:
-        plt.figure(figsize=(12, 8))
+        plt.figure(figsize=(6, 4))
         
         # Create the main plot
         ax = plt.gca()
+        # Store handles for manual legend control
+        handles = []
+        labels = []
         
         # Plot each model
         for i, (model_name, model_data) in enumerate(model_results.items()):
@@ -183,13 +186,25 @@ def create_comparison_plots(model_results, anova_results, output_dir="."):
             
             # Fill area under the line
             ax.fill_between(x_values, segment_scores, alpha=0.3, color=color)
+            
+            handles.append(line)
+            labels.append(model_name)
         
         # Customize the plot
         ax.set_xlabel('Tone Percentage', fontsize=14, fontweight='bold')
-        ax.set_ylabel(f'{metric.upper()} Score', fontsize=14, fontweight='bold')
-        ax.set_title(f'{metric.upper()} Comparison Across Models', fontsize=16, fontweight='bold')
+        # ax.set_ylabel(f'{metric.upper()} Score', fontsize=14, fontweight='bold')
+        # ax.set_title(f'{metric.upper()} Comparison Across Models', fontsize=16, fontweight='bold')
+        ax.set_ylabel('BLEU Score', fontsize=14, fontweight='bold')
+        ax.set_title('BLEU Comparison Across Models', fontsize=16, fontweight='bold')
+
+        order = [1, 0]  # if you want second plotted line first
+        ax.legend([handles[i] for i in order],
+                [labels[i] for i in order],
+                fontsize=12, frameon=True, fancybox=True, shadow=True)
         ax.legend(fontsize=12, frameon=True, fancybox=True, shadow=True)
         ax.grid(True, alpha=0.3)
+        # Set y-axis range from 80 to 100
+        ax.set_ylim(80, 100)
         
         # Set x-axis to reverse order (100% to 10%)
         ax.set_xlim(105, 5)

@@ -57,8 +57,38 @@
 # do_eval: true
 # # do_predict: true
 
+# ########
+# # Test 1 Passage_10pc_v1
+# ### model
+# model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/checkpoint-4529
+# trust_remote_code: true
+
+# ### method
+# stage: sft
+# do_predict: true
+# finetuning_type: full
+
+# ### dataset
+# eval_dataset: passage_test_10pc_0801_v1
+# template: qwen
+# cutoff_len: 2048
+# # max_samples: 50
+# preprocessing_num_workers: 32
+# dataloader_num_workers: 16
+
+# ### output
+# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/test_passage_10pc_v1
+# overwrite_output_dir: true
+# report_to: swanlab  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+
+# ### evaluation
+# per_device_eval_batch_size: 20
+# predict_with_generate: true
+# ddp_timeout: 180000000
+
+
 ########
-# Test 1 Passage_10pc_v1
+# Test 1 Passage_10pc_no_special_token_v1
 ### model
 model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/checkpoint-4529
 trust_remote_code: true
@@ -69,7 +99,7 @@ do_predict: true
 finetuning_type: full
 
 ### dataset
-eval_dataset: passage_test_10pc_0801_v1
+eval_dataset: passage_test_10pc_no_special_token_0802_v1
 template: qwen
 cutoff_len: 2048
 # max_samples: 50
@@ -77,7 +107,7 @@ preprocessing_num_workers: 32
 dataloader_num_workers: 16
 
 ### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/test_passage_10pc_v1
+output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/test_passage_10pc_no_special_token_0802_v1
 overwrite_output_dir: true
 report_to: swanlab  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 

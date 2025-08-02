@@ -1,0 +1,7 @@
+{
+    "anova_results": {
+        "rouge-1": {
+            "f_statistic": 1746.480603737617,
+            "p_value": 0.0,
+            "eta_squared": 0.013555161275650377,
+            "significant": 

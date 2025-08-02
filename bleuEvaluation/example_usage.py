@@ -19,9 +19,8 @@ def run_model_comparison():
     
     # Example model files (replace with your actual files)
     model_files = [
-        "path/to/model1_predictions.json",
-        "path/to/model2_predictions.json", 
-        "path/to/model3_predictions.json"
+        "saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_resume_from_v1_v3/test/generated_predictions.jsonl",
+        "saves/Qwen2.5-7B-Instruct-Braille/7B_sentence_10pc_qwen2.5i_train_fullsft_0731_v1/test/generated_predictions.jsonl"
     ]
     
     # Join the files with commas for the script input

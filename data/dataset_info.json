@@ -550,5 +550,19 @@
       "assistant_tag": "assistant",
       "system_tag": "system"
     }
+  },
+  "passage_test_10pc_no_special_token_0802_v1": {
+    "file_name": "Passage_dataset/passage_10pc/passage_test_10pc_no_special_token_0802_v1.json",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
   }
+
+
 }
