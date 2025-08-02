@@ -11,7 +11,7 @@ import os
 INPUT_JSON = "saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/test_Passage_10pc_v2/generated_predictions.jsonl"
 # Get the directory of the input file
 INPUT_DIR = os.path.dirname(os.path.abspath(INPUT_JSON))
-OUTPUT_JSON = os.path.join(INPUT_DIR, "vllm_generated_predictions_polishedOutput_7bbraille_0802.json")
+OUTPUT_JSON = os.path.join(INPUT_DIR, "generated_predictions_polishedOutput_7bbraille_0802_v1.json")
 MODEL_NAME = "models/Qwen2.5-7B-Instruct"
 BATCH_SIZE = 20  # You can adjust this based on your GPU memory
 
