@@ -59,30 +59,35 @@
 # do_eval: true
 
 
-########
-# Test 1 Passage_10pc_v2
-### model
-model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/checkpoint-3397
-trust_remote_code: true
+# ########
+# # Test 1 Passage_10pc_v2
+# ### model
+# model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/checkpoint-3397
+# trust_remote_code: true
 
-### method
-stage: sft
-do_predict: true
-finetuning_type: full
+# ### method
+# stage: sft
+# do_predict: true
+# finetuning_type: full
 
-### dataset
-eval_dataset: passage_test_10pc_0801_v1
-template: qwen
-cutoff_len: 2048
-preprocessing_num_workers: 16
-dataloader_num_workers: 4
+# ### dataset
+# eval_dataset: passage_test_10pc_0801_v1
+# template: qwen
+# cutoff_len: 2048
+# preprocessing_num_workers: 16
+# dataloader_num_workers: 4
 
-### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/test_Passage_10pc_v2
-overwrite_output_dir: true
-report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+# ### output
+# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/test_Passage_10pc_v2
+# overwrite_output_dir: true
+# report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 
-### evaluation
-per_device_eval_batch_size: 20
-predict_with_generate: true
-ddp_timeout: 180000000
+# ### evaluation
+# per_device_eval_batch_size: 20
+# predict_with_generate: true
+# ddp_timeout: 180000000
+
+
+##########
+# Polish output
+# python PolishOutput/PolishOutput7B_qwen2.5i_train_fullsft_sentence_100pc_20pc_10pc_0730_v3->passage_10pc_v2/test_Passage_10pc_v2.py
