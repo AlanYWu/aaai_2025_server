@@ -1,11 +1,11 @@
 # ### goal
 # # Train sentence Qwen2.5 7B Instruct on 2 H800 80GB
 # # 同样的设置，增加了batch size
+# # V2 修改cutoff length
 
 # ### model
-# model_name_or_path: models/Qwen2.5-7B-Instruct-Braille
+# model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_sentence_100pc_0730_v1/checkpoint-10000
 # trust_remote_code: true
-# resume_from_checkpoint: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/checkpoint-3500
 
 # ### method
 # stage: sft
@@ -20,22 +20,22 @@
 
 
 # ### dataset
-# dataset: passage_train_10pc_0801_v1
+# dataset: passage_100pc_train_0727_v2
 # template: qwen # sharegpt
-# cutoff_len: 2048 
+# cutoff_len: 2048
 # # max_samples: 500
 # overwrite_cache: true
 # preprocessing_num_workers: 4
 
 # ### output
-# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/
+# output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence->passage_100pc_qwen2.5i_train_fullsft_0730_v2/
 # logging_steps: 10
 # save_steps: 500
 # plot_loss: true
-# # overwrite_output_dir: true
+# overwrite_output_dir: true
 
 # ### train
-# per_device_train_batch_size: 3
+# per_device_train_batch_size: 4
 # gradient_accumulation_steps: 1
 # learning_rate: 4.0e-5
 # num_train_epochs: 1.0
@@ -49,18 +49,19 @@
 # disable_shuffling: true
 
 # ### eval
-# eval_dataset: passage_val_10pc_0801_v1
-# per_device_eval_batch_size: 3
+# eval_dataset: passage_100pc_val_0727_v2
+# per_device_eval_batch_size: 4
 # eval_strategy: steps
 # eval_steps: 500
 # # predict_with_generate: true
 # do_eval: true
 # # do_predict: true
 
+
 ########
-# Test 1 Passage_10pc_v1
+# Test 1 Passage_100pc_v2
 ### model
-model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/checkpoint-4529
+model_name_or_path: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence->passage_100pc_qwen2.5i_train_fullsft_0730_v2/checkpoint-3397
 trust_remote_code: true
 
 ### method
@@ -69,20 +70,18 @@ do_predict: true
 finetuning_type: full
 
 ### dataset
-eval_dataset: passage_test_10pc_0801_v1
+eval_dataset: passage_100pc_test_0727_v2
 template: qwen
 cutoff_len: 2048
-# max_samples: 50
 preprocessing_num_workers: 32
 dataloader_num_workers: 16
 
 ### output
-output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_qwen2.5i_train_fullsft_passage_10pc_0801_v1/test_passage_10pc_v1
+output_dir: saves/Qwen2.5-7B-Instruct-Braille/7B_sentence->passage_100pc_qwen2.5i_train_fullsft_0730_v2/test_100pc_v2
 overwrite_output_dir: true
-report_to: swanlab  # choices: [none, wandb, tensorboard, swanlab, mlflow]
+report_to: none  # choices: [none, wandb, tensorboard, swanlab, mlflow]
 
 ### evaluation
 per_device_eval_batch_size: 20
 predict_with_generate: true
 ddp_timeout: 180000000
-
