@@ -9,7 +9,7 @@ ROOT_DIR="$(cd "${THIS_DIR}/../../" && pwd)"
 
 # If you use a different launcher (e.g., python -m llamafactory), replace the command below accordingly.
 LAUNCH() {
-	llamafactory-cli train "$@"
+	FORCE_TORCHRUN=1 llamafactory-cli train "$@"
 }
 
 # Stage 1
