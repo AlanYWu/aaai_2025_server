@@ -550,5 +550,77 @@
       "assistant_tag": "assistant",
       "system_tag": "system"
     }
+  },
+  "bidirectional_b2c_train_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/data_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "bidirectional_b2c_validation_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/data_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "bidirectional_b2c_test_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/data_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "bidirectional_c2b_train_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/data_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "bidirectional_c2b_validation_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/data_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
+  },
+  "bidirectional_c2b_test_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/data_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system"
+    }
   }
 }
