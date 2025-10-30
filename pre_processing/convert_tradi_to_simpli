@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""
+Convert Traditional Chinese to Simplified Chinese in a JSONL file.
+
+Usage examples:
+  python pre_processing/convert_ --input /abs/path/in.jsonl --output /abs/path/out.jsonl
+  python pre_processing/convert_ --input /abs/path/in.jsonl --inplace
+  python pre_processing/convert_ --input in.jsonl --output out.jsonl --fields text title
+
+Requires: opencc-python-reimplemented
+  pip install opencc-python-reimplemented
+"""
+
+import argparse
+import json
+import sys
+from typing import Any, Iterable, Optional
+
+try:
+    from opencc import OpenCC
+except Exception as exc:  # pragma: no cover
+    sys.stderr.write(
+        "[ERROR] Missing dependency 'opencc-python-reimplemented'. Install with:\n"
+        "        pip install opencc-python-reimplemented\n"
+    )
+    raise
+
+
+def convert_string_trad_to_simp(text: str, converter: OpenCC) -> str:
+    return converter.convert(text)
+
+
+def convert_obj_recursive(obj: Any, converter: OpenCC) -> Any:
+    if isinstance(obj, str):
+        return convert_string_trad_to_simp(obj, converter)
+    if isinstance(obj, list):
+        return [convert_obj_recursive(item, converter) for item in obj]
+    if isinstance(obj, dict):
+        return {key: convert_obj_recursive(value, converter) for key, value in obj.items()}
+    return obj
+
+
+def convert_selected_fields(obj: dict, fields: Iterable[str], converter: OpenCC) -> dict:
+    if not isinstance(obj, dict):
+        return obj
+    result = dict(obj)
+    for field in fields:
+        if field in result:
+            result[field] = convert_obj_recursive(result[field], converter)
+    return result
+
+
+def process_jsonl(
+    input_path: str,
+    output_path: str,
+    fields: Optional[Iterable[str]] = None,
+    encoding: str = "utf-8",
+) -> None:
+    converter = OpenCC("t2s")
+    with open(input_path, "r", encoding=encoding) as fin, open(output_path, "w", encoding=encoding) as fout:
+        for line in fin:
+            raw = line.strip()
+            if not raw:
+                continue
+            record = json.loads(raw)
+            if fields:
+                converted = convert_selected_fields(record, fields, converter)
+            else:
+                converted = convert_obj_recursive(record, converter)
+            fout.write(json.dumps(converted, ensure_ascii=False) + "\n")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        description="Convert Traditional Chinese to Simplified Chinese in JSONL."
+    )
+    parser.add_argument("--input", required=True, help="Absolute path to input JSONL file")
+    out_group = parser.add_mutually_exclusive_group(required=True)
+    out_group.add_argument("--output", help="Absolute path to output JSONL file")
+    out_group.add_argument("--inplace", action="store_true", help="Convert in place (overwrite input)")
+    parser.add_argument(
+        "--fields",
+        nargs="*",
+        help="Optional list of JSON field names to convert. If omitted, convert all strings recursively.",
+    )
+    parser.add_argument(
+        "--encoding",
+        default="utf-8",
+        help="File encoding (default: utf-8)",
+    )
+
+    args = parser.parse_args()
+
+    input_path = args.input
+    output_path = args.output
+
+    if args.inplace:
+        # Write to a temp file first, then replace atomically
+        import os
+        import tempfile
+
+        dir_name = os.path.dirname(input_path) or "."
+        with tempfile.NamedTemporaryFile("w", delete=False, dir=dir_name, encoding=args.encoding) as tmp:
+            temp_path = tmp.name
+        try:
+            process_jsonl(input_path, temp_path, args.fields, args.encoding)
+            os.replace(temp_path, input_path)
+        except Exception:
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+            raise
+    else:
+        process_jsonl(input_path, output_path, args.fields, args.encoding)
+
+
+if __name__ == "__main__":
+    main()
+
+
