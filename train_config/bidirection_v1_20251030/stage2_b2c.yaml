@@ -14,10 +14,7 @@ deepspeed: train_config/deepspeed/ds_z3_config.json
 
 ### dataset
 # Use dataset keys defined in data/dataset_info.json
-# train: bidirectional_b2c_train_20251030
-# val:   bidirectional_b2c_validation_20251030
-# test:  bidirectional_b2c_test_20251030 (optional)
-dataset: bidirectional_b2c_train_20251030
+dataset: bidirectional_b2c_sentence_train_20251030,bidirectional_b2c_passage_train_20251030
 template: qwen
 cutoff_len: 2048 
 overwrite_cache: true
@@ -43,7 +40,7 @@ flash_attn: auto
 disable_shuffling: true     # Keep order stable in stage 2
 
 ### eval
-eval_dataset: bidirectional_b2c_validation_20251030
+eval_dataset: bidirectional_b2c_sentence_validation_20251030,bidirectional_b2c_passage_validation_20251030
 per_device_eval_batch_size: 4
 eval_strategy: steps
 eval_steps: 500

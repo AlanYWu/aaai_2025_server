@@ -622,5 +622,77 @@
       "assistant_tag": "assistant",
       "system_tag": "system"
     }
+  },
+  "bidirectional_b2c_sentence_train_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/sentence_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_b2c_sentence_validation_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/sentence_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_b2c_sentence_test_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/sentence_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_b2c_passage_train_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/passage_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_b2c_passage_validation_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/passage_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_b2c_passage_test_20251030": {
+    "file_name": "datasets/bidirectional_braille_to_chinese_v1_20251030/passage_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_sentence_train_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/sentence_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_sentence_validation_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/sentence_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_sentence_test_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/sentence_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_passage_train_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/passage_train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_passage_validation_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/passage_validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
+  },
+  "bidirectional_c2b_passage_test_20251030": {
+    "file_name": "datasets/bidirectional_chinese_to_braille_v1_20251030/passage_test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {"messages": "messages"},
+    "tags": {"role_tag": "role", "content_tag": "content", "user_tag": "user", "assistant_tag": "assistant", "system_tag": "system"}
   }
 }

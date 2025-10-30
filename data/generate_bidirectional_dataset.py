@@ -86,7 +86,7 @@ def make_b2c_sample(braille_text: str, chinese_text: str) -> Dict[str, Any]:
 	return {
 		"messages": [
 			{"role": "system", "content": "你是一个中国盲文翻译助手，请把通用盲文转换成为汉字。"},
-			{"role": "user", "content": f"请把以下通用盲文转换成为汉字：\nBraille content:\n{braille_text}<BRAILLE_END>"},
+			{"role": "user", "content": f"请把以下通用盲文转换成为汉字：\n盲文内容是:\n{braille_text}<BRAILLE_END>"},
 			{"role": "assistant", "content": f"对应的中文内容是：\n{chinese_text}<TRANSLATION_END>"},
 		]
 	}
@@ -96,7 +96,7 @@ def make_c2b_sample(braille_text: str, chinese_text: str) -> Dict[str, Any]:
 	return {
 		"messages": [
 			{"role": "system", "content": "你是一个中国盲文翻译助手，请把汉字转换成为通用盲文。"},
-			{"role": "user", "content": f"请把以下中文转换成为通用盲文：\nChinese content:\n{chinese_text}<CHINESE_END>"},
+			{"role": "user", "content": f"请把以下中文转换成为通用盲文：\n中文内容是:\n{chinese_text}<CHINESE_END>"},
 			{"role": "assistant", "content": f"对应的盲文内容是：\n{braille_text}<TRANSLATION_END>"},
 		]
 	}
@@ -140,7 +140,7 @@ def write_readme(path: Path, *, direction: str, sources: List[str]) -> None:
 	for s in sources:
 		lines.append(f"- {s}\n")
 	lines.append("\n样本格式: 三段消息 (system/user/assistant)。输出以 <TRANSLATION_END> 结束，输入侧根据模态包含 <BRAILLE_END> 或 <CHINESE_END>。\n")
-	lines.append("\n划分: 8:1:1 (train:validation:test)。对应文件为 data_train.jsonl, data_validation.jsonl, data_test.jsonl。\n")
+	lines.append("\n划分: 8:1:1 (train:validation:test)。每个方向下分别输出 sentence_* 与 passage_* 三个切分文件。\n")
 	with path.open('w', encoding='utf-8') as f:
 		f.write(''.join(lines))
 
@@ -150,7 +150,7 @@ def ensure_dir(path: Path) -> None:
 
 
 def split_rows(rows: List[Dict[str, Any]], *, seed: int, ratios: Tuple[float, float, float] = (0.8, 0.1, 0.1)) -> Dict[str, List[Dict[str, Any]]]:
-	random.Random(seed).shuffle(rows)
+	# No random shuffle: keep original order
 	n = len(rows)
 	n_train = int(n * ratios[0])
 	n_val = int(n * ratios[1])
@@ -179,8 +179,7 @@ def build_datasets(
 		random_seed: int = 17,
 		limit_each: int = 0,
 	) -> None:
-	# Read
-	random.seed(random_seed)
+	# Read (order preserved)
 	passage_items = load_many(passage_paths, head_limit=limit_each)
 	sentence_items = load_many(sentence_paths, head_limit=limit_each)
 
@@ -203,27 +202,20 @@ def build_datasets(
 	if not sentence_pairs:
 		raise RuntimeError("No valid pairs parsed from sentence datasets")
 
-	# 50-50 mixing for each direction
-	min_count = min(len(passage_pairs), len(sentence_pairs))
-	use_n_each = min_count
+	# Split each source into halves: first half → b2c, second half → c2b
+	def halves(pairs: List[Tuple[str, str]]) -> Tuple[List[Tuple[str, str]], List[Tuple[str, str]]]:
+		n = len(pairs)
+		h = n // 2
+		return pairs[:h], pairs[h:]
 
-	random.shuffle(passage_pairs)
-	random.shuffle(sentence_pairs)
+	passage_b2c_pairs, passage_c2b_pairs = halves(passage_pairs)
+	sentence_b2c_pairs, sentence_c2b_pairs = halves(sentence_pairs)
 
-	passage_subset = passage_pairs[:use_n_each]
-	sentence_subset = sentence_pairs[:use_n_each]
-
-	# Build direction-specific rows
-	b2c_rows: List[Dict[str, Any]] = []
-	c2b_rows: List[Dict[str, Any]] = []
-
-	for braille, chinese in passage_subset + sentence_subset:
-		b2c_rows.append(make_b2c_sample(braille, chinese))
-		c2b_rows.append(make_c2b_sample(braille, chinese))
-
-	# Shuffle within each set
-	random.shuffle(b2c_rows)
-	random.shuffle(c2b_rows)
+	# Build rows per source and direction (order preserved)
+	passage_b2c_rows: List[Dict[str, Any]] = [make_b2c_sample(b, c) for (b, c) in passage_b2c_pairs]
+	passage_c2b_rows: List[Dict[str, Any]] = [make_c2b_sample(b, c) for (b, c) in passage_c2b_pairs]
+	sentence_b2c_rows: List[Dict[str, Any]] = [make_b2c_sample(b, c) for (b, c) in sentence_b2c_pairs]
+	sentence_c2b_rows: List[Dict[str, Any]] = [make_c2b_sample(b, c) for (b, c) in sentence_c2b_pairs]
 
 	# Prepare output dirs
 	date_tag = datetime.utcnow().strftime('%Y%m%d')
@@ -235,42 +227,60 @@ def build_datasets(
 	ensure_dir(b2c_dir)
 	ensure_dir(c2b_dir)
 
-	# Split and write b2c
-	b2c_splits = split_rows(b2c_rows, seed=random_seed)
-	write_jsonl(b2c_dir / 'data_train.jsonl', b2c_splits['train'])
-	write_jsonl(b2c_dir / 'data_validation.jsonl', b2c_splits['validation'])
-	write_jsonl(b2c_dir / 'data_test.jsonl', b2c_splits['test'])
+	# Split and write: B2C
+	b2c_sentence_splits = split_rows(sentence_b2c_rows, seed=random_seed)
+	b2c_passage_splits = split_rows(passage_b2c_rows, seed=random_seed)
+	write_jsonl(b2c_dir / 'sentence_train.jsonl', b2c_sentence_splits['train'])
+	write_jsonl(b2c_dir / 'sentence_validation.jsonl', b2c_sentence_splits['validation'])
+	write_jsonl(b2c_dir / 'sentence_test.jsonl', b2c_sentence_splits['test'])
+	write_jsonl(b2c_dir / 'passage_train.jsonl', b2c_passage_splits['train'])
+	write_jsonl(b2c_dir / 'passage_validation.jsonl', b2c_passage_splits['validation'])
+	write_jsonl(b2c_dir / 'passage_test.jsonl', b2c_passage_splits['test'])
 	write_metadata(
 		b2c_dir / 'metadata.yaml',
 		direction='Braille→Chinese',
-		total=len(b2c_rows),
-		split_counts={k: len(v) for k, v in b2c_splits.items()},
+		total=len(sentence_b2c_rows) + len(passage_b2c_rows),
+		split_counts={
+			"train": len(b2c_sentence_splits['train']) + len(b2c_passage_splits['train']),
+			"validation": len(b2c_sentence_splits['validation']) + len(b2c_passage_splits['validation']),
+			"test": len(b2c_sentence_splits['test']) + len(b2c_passage_splits['test']),
+		},
 		sources=[str(p) for p in passage_paths + sentence_paths],
 		special_tokens=['<BRAILLE_END>', '<CHINESE_END>', '<TRANSLATION_END>'],
 	)
 	write_readme(b2c_dir / 'README.md', direction='Braille→Chinese', sources=[str(p) for p in passage_paths + sentence_paths])
 
-	# Split and write c2b
-	c2b_splits = split_rows(c2b_rows, seed=random_seed)
-	write_jsonl(c2b_dir / 'data_train.jsonl', c2b_splits['train'])
-	write_jsonl(c2b_dir / 'data_validation.jsonl', c2b_splits['validation'])
-	write_jsonl(c2b_dir / 'data_test.jsonl', c2b_splits['test'])
+	# Split and write: C2B
+	c2b_sentence_splits = split_rows(sentence_c2b_rows, seed=random_seed)
+	c2b_passage_splits = split_rows(passage_c2b_rows, seed=random_seed)
+	write_jsonl(c2b_dir / 'sentence_train.jsonl', c2b_sentence_splits['train'])
+	write_jsonl(c2b_dir / 'sentence_validation.jsonl', c2b_sentence_splits['validation'])
+	write_jsonl(c2b_dir / 'sentence_test.jsonl', c2b_sentence_splits['test'])
+	write_jsonl(c2b_dir / 'passage_train.jsonl', c2b_passage_splits['train'])
+	write_jsonl(c2b_dir / 'passage_validation.jsonl', c2b_passage_splits['validation'])
+	write_jsonl(c2b_dir / 'passage_test.jsonl', c2b_passage_splits['test'])
 	write_metadata(
 		c2b_dir / 'metadata.yaml',
 		direction='Chinese→Braille',
-		total=len(c2b_rows),
-		split_counts={k: len(v) for k, v in c2b_splits.items()},
+		total=len(sentence_c2b_rows) + len(passage_c2b_rows),
+		split_counts={
+			"train": len(c2b_sentence_splits['train']) + len(c2b_passage_splits['train']),
+			"validation": len(c2b_sentence_splits['validation']) + len(c2b_passage_splits['validation']),
+			"test": len(c2b_sentence_splits['test']) + len(c2b_passage_splits['test']),
+		},
 		sources=[str(p) for p in passage_paths + sentence_paths],
 		special_tokens=['<BRAILLE_END>', '<CHINESE_END>', '<TRANSLATION_END>'],
 	)
 	write_readme(c2b_dir / 'README.md', direction='Chinese→Braille', sources=[str(p) for p in passage_paths + sentence_paths])
 
-	print(f"Wrote B2C splits to {b2c_dir} → train:{len(b2c_splits['train'])} val:{len(b2c_splits['validation'])} test:{len(b2c_splits['test'])}")
-	print(f"Wrote C2B splits to {c2b_dir} → train:{len(c2b_splits['train'])} val:{len(c2b_splits['validation'])} test:{len(c2b_splits['test'])}")
+	print(f"[B2C] sentence: train {len(b2c_sentence_splits['train'])} val {len(b2c_sentence_splits['validation'])} test {len(b2c_sentence_splits['test'])}")
+	print(f"[B2C] passage:  train {len(b2c_passage_splits['train'])} val {len(b2c_passage_splits['validation'])} test {len(b2c_passage_splits['test'])}")
+	print(f"[C2B] sentence: train {len(c2b_sentence_splits['train'])} val {len(c2b_sentence_splits['validation'])} test {len(c2b_sentence_splits['test'])}")
+	print(f"[C2B] passage:  train {len(c2b_passage_splits['train'])} val {len(c2b_passage_splits['validation'])} test {len(c2b_passage_splits['test'])}")
 
 
 def main() -> None:
-	parser = argparse.ArgumentParser(description='Generate 50/50 bidirectional datasets (Braille↔Chinese).')
+	parser = argparse.ArgumentParser(description='Generate bidirectional datasets (Braille↔Chinese) splitting each source (sentence/passage) into halves without shuffling.')
 	parser.add_argument('--passage', type=str, nargs='*', default=[], help='Paths to passage JSON files (train/val/test etc)')
 	parser.add_argument('--sentence', type=str, nargs='*', default=[], help='Paths to sentence JSON files (train/val/test etc)')
 	parser.add_argument('--auto_old_100pc', action='store_true', help='Auto-include standard 100pc train/val/test files for sentence and passage')
