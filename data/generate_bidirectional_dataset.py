@@ -8,7 +8,7 @@ import re
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple, Any
+from typing import Dict, List, Tuple, Any, Iterable
 
 
 def read_json_list(path: Path, head_limit: int = 0) -> List[Dict[str, Any]]:
@@ -162,9 +162,18 @@ def split_rows(rows: List[Dict[str, Any]], *, seed: int, ratios: Tuple[float, fl
 	}
 
 
+def load_many(paths: Iterable[Path], head_limit: int = 0) -> List[Dict[str, Any]]:
+	items: List[Dict[str, Any]] = []
+	for p in paths:
+		if not p.exists():
+			continue
+		items.extend(read_json_list(p, head_limit=head_limit))
+	return items
+
+
 def build_datasets(
-		passage_path: Path,
-		sentence_path: Path,
+		passage_paths: List[Path],
+		sentence_paths: List[Path],
 		output_root: Path,
 		name_prefix: str = "bidirectional",
 		random_seed: int = 17,
@@ -172,8 +181,8 @@ def build_datasets(
 	) -> None:
 	# Read
 	random.seed(random_seed)
-	passage_items = read_json_list(passage_path, head_limit=limit_each)
-	sentence_items = read_json_list(sentence_path, head_limit=limit_each)
+	passage_items = load_many(passage_paths, head_limit=limit_each)
+	sentence_items = load_many(sentence_paths, head_limit=limit_each)
 
 	def to_pairs(items: List[Dict[str, Any]]) -> List[Tuple[str, str]]:
 		pairs: List[Tuple[str, str]] = []
@@ -190,13 +199,12 @@ def build_datasets(
 	sentence_pairs = to_pairs(sentence_items)
 
 	if not passage_pairs:
-		raise RuntimeError("No valid pairs parsed from passage dataset")
+		raise RuntimeError("No valid pairs parsed from passage datasets")
 	if not sentence_pairs:
-		raise RuntimeError("No valid pairs parsed from sentence dataset")
+		raise RuntimeError("No valid pairs parsed from sentence datasets")
 
 	# 50-50 mixing for each direction
 	min_count = min(len(passage_pairs), len(sentence_pairs))
-	# Use all or truncate to match the smaller to keep 50-50
 	use_n_each = min_count
 
 	random.shuffle(passage_pairs)
@@ -237,10 +245,10 @@ def build_datasets(
 		direction='Braille→Chinese',
 		total=len(b2c_rows),
 		split_counts={k: len(v) for k, v in b2c_splits.items()},
-		sources=[str(passage_path), str(sentence_path)],
+		sources=[str(p) for p in passage_paths + sentence_paths],
 		special_tokens=['<BRAILLE_END>', '<CHINESE_END>', '<TRANSLATION_END>'],
 	)
-	write_readme(b2c_dir / 'README.md', direction='Braille→Chinese', sources=[str(passage_path), str(sentence_path)])
+	write_readme(b2c_dir / 'README.md', direction='Braille→Chinese', sources=[str(p) for p in passage_paths + sentence_paths])
 
 	# Split and write c2b
 	c2b_splits = split_rows(c2b_rows, seed=random_seed)
@@ -252,10 +260,10 @@ def build_datasets(
 		direction='Chinese→Braille',
 		total=len(c2b_rows),
 		split_counts={k: len(v) for k, v in c2b_splits.items()},
-		sources=[str(passage_path), str(sentence_path)],
+		sources=[str(p) for p in passage_paths + sentence_paths],
 		special_tokens=['<BRAILLE_END>', '<CHINESE_END>', '<TRANSLATION_END>'],
 	)
-	write_readme(c2b_dir / 'README.md', direction='Chinese→Braille', sources=[str(passage_path), str(sentence_path)])
+	write_readme(c2b_dir / 'README.md', direction='Chinese→Braille', sources=[str(p) for p in passage_paths + sentence_paths])
 
 	print(f"Wrote B2C splits to {b2c_dir} → train:{len(b2c_splits['train'])} val:{len(b2c_splits['validation'])} test:{len(b2c_splits['test'])}")
 	print(f"Wrote C2B splits to {c2b_dir} → train:{len(c2b_splits['train'])} val:{len(c2b_splits['validation'])} test:{len(c2b_splits['test'])}")
@@ -263,26 +271,43 @@ def build_datasets(
 
 def main() -> None:
 	parser = argparse.ArgumentParser(description='Generate 50/50 bidirectional datasets (Braille↔Chinese).')
-	parser.add_argument('--passage', type=str, required=True, help='Path to passage JSON file')
-	parser.add_argument('--sentence', type=str, required=True, help='Path to sentence JSON file')
+	parser.add_argument('--passage', type=str, nargs='*', default=[], help='Paths to passage JSON files (train/val/test etc)')
+	parser.add_argument('--sentence', type=str, nargs='*', default=[], help='Paths to sentence JSON files (train/val/test etc)')
+	parser.add_argument('--auto_old_100pc', action='store_true', help='Auto-include standard 100pc train/val/test files for sentence and passage')
 	parser.add_argument('--out_root', type=str, default='datasets', help='Output root directory')
 	parser.add_argument('--seed', type=int, default=17)
-	parser.add_argument('--limit_each', type=int, default=0, help='Limit records per source (0 means all, matched to the smaller)')
+	parser.add_argument('--limit_each', type=int, default=0, help='Limit records per source file (0 means all)')
 	args = parser.parse_args()
 
-	passage_path = Path(args.passage).expanduser().resolve()
-	sentence_path = Path(args.sentence).expanduser().resolve()
+	passage_paths: List[Path] = [Path(p).expanduser().resolve() for p in args.passage]
+	sentence_paths: List[Path] = [Path(s).expanduser().resolve() for s in args.sentence]
+
+	if args.auto_old_100pc:
+		passage_paths.extend([
+			Path('data/Passage_dataset/passage_100pc_train_0727_v2.json').resolve(),
+			Path('data/Passage_dataset/passage_100pc_val_0727_v2.json').resolve(),
+			Path('data/Passage_dataset/passage_100pc_test_0727_v2.json').resolve(),
+		])
+		sentence_paths.extend([
+			Path('data/Sentence_dataset/set-Full-Tone/sentence_100pc_train_0727_v2.json').resolve(),
+			Path('data/Sentence_dataset/set-Full-Tone/sentence_100pc_val_0727_v2.json').resolve(),
+			Path('data/Sentence_dataset/set-Full-Tone/sentence_100pc_test_0727_v2.json').resolve(),
+		])
+
+	# Filter non-existent
+	passage_paths = [p for p in passage_paths if p.exists()]
+	sentence_paths = [s for s in sentence_paths if s.exists()]
+
+	if not passage_paths:
+		print("ERROR: no passage files provided/found", file=sys.stderr)
+		sys.exit(1)
+	if not sentence_paths:
+		print("ERROR: no sentence files provided/found", file=sys.stderr)
+		sys.exit(1)
+
 	out_root = Path(args.out_root).expanduser().resolve()
-
-	if not passage_path.exists():
-		print(f"ERROR: passage file not found: {passage_path}", file=sys.stderr)
-		sys.exit(1)
-	if not sentence_path.exists():
-		print(f"ERROR: sentence file not found: {sentence_path}", file=sys.stderr)
-		sys.exit(1)
-
 	ensure_dir(out_root)
-	build_datasets(passage_path, sentence_path, out_root, random_seed=args.seed, limit_each=args.limit_each)
+	build_datasets(passage_paths, sentence_paths, out_root, random_seed=args.seed, limit_each=args.limit_each)
 
 
 if __name__ == '__main__':
