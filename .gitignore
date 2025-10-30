@@ -254,3 +254,7 @@ data/Sentence_dataset/test/test_80pc.json
 data/Sentence_dataset/test/test_90pc.json
 data/Sentence_dataset/test/test_100pc.json
 models/Qwen2.5-7B-Instruct-Braille
+
+*.jsonl
+/datasets/
+data/sampled_data/
