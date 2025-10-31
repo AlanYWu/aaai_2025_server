@@ -1,0 +1,20 @@
+name: bidirectional_braille_to_chinese_v1_20251030
+direction: Braille→Chinese
+num_samples: 334725
+splits:
+  train: 267779
+  validation: 33472
+  test: 33474
+created_utc: 2025-10-30T18:20:47Z
+sources:
+  - /workspace/wuyou/aaai_2025_server/data/Passage_dataset/passage_100pc_train_0727_v2.json
+  - /workspace/wuyou/aaai_2025_server/data/Passage_dataset/passage_100pc_val_0727_v2.json
+  - /workspace/wuyou/aaai_2025_server/data/Passage_dataset/passage_100pc_test_0727_v2.json
+  - /workspace/wuyou/aaai_2025_server/data/Sentence_dataset/set-Full-Tone/sentence_100pc_train_0727_v2.json
+  - /workspace/wuyou/aaai_2025_server/data/Sentence_dataset/set-Full-Tone/sentence_100pc_val_0727_v2.json
+  - /workspace/wuyou/aaai_2025_server/data/Sentence_dataset/set-Full-Tone/sentence_100pc_test_0727_v2.json
+prompt_schema: chat-3role-v1
+special_tokens:
+  - <BRAILLE_END>
+  - <CHINESE_END>
+  - <TRANSLATION_END>
