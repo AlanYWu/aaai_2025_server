@@ -1,0 +1,14 @@
+{
+  "system": "<|im_start|>system\n{system}<|im_end|>\n",
+  "prompt": "<|im_start|>user\n请把以下通用盲文转换成为汉字：\n盲文内容是:\n{input}<BRAILLE_END><|im_end|>\n<|im_start|>assistant\n",
+  "response": "{output}<TRANSLATION_END>",
+  "stop_words": ["<|im_end|>", "<TRANSLATION_END>"],
+  "eos_token": "<|im_end|>",
+  "role_map": {
+    "user": "user",
+    "assistant": "assistant",
+    "system": "system"
+  },
+  "chat_sep": "\n",
+  "default_system": "你是一个中国盲文翻译助手，请把通用盲文转换成为汉字。"
+}
