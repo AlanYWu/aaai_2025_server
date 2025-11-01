@@ -195,6 +195,9 @@ def create_comparison_plots(model_results, anova_results, output_dir="."):
         ax.set_xlim(105, 5)
         ax.invert_xaxis()
         
+        # Set y-axis range from 80 to 100
+        ax.set_ylim(80, 100)
+        
         # Add ANOVA results as text if available
         if metric in anova_results:
             anova_info = anova_results[metric]

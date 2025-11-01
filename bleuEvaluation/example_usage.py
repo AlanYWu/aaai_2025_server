@@ -32,7 +32,7 @@ def run_model_comparison():
     
     # Run the comparison script
     cmd = [
-        "python", "eval_bleu_model_comparison.py",
+        "python", "bleuEvaluation/eval_bleu_model_comparison.py",
         "--model_files", model_files_str,
         "--output_dir", output_dir
     ]

@@ -121,7 +121,6 @@ def process_file_10pc(
 
     # Ensure output directory exists
     output_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Output directory: {output_dir}")
 
     # Process all conversations to keep only 10% of tones
     print("Processing conversations to keep 10% of tones...")
@@ -174,8 +173,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Process Braille JSON to keep only 10% of tone marks.'
     )
-    parser.add_argument('input', nargs='?', default="Passage_dataset/passage_100pc_train_0727_v2.json", type=str, help='Path to input JSON file')
-    parser.add_argument('output_dir', nargs='?', default="Passage_dataset/passage_10pc_train_0727_v2", type=str, help='Directory to save processed JSON')
+    parser.add_argument('input', type=str, help='Path to input JSON file')
+    parser.add_argument('output_dir', type=str, help='Directory to save processed JSON')
     args = parser.parse_args()
 
     process_file_10pc(Path(args.input), Path(args.output_dir))
